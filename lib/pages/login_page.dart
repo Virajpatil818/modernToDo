@@ -38,6 +38,38 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+import 'home_page.dart';
+
+class LoginPage extends StatelessWidget {
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  LoginPage({super.key});
+
+  Future<void> signIn(BuildContext context) async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: usernameController.text,
+        password: passwordController.text,
+      );
+      SnackBar snackBar = SnackBar(
+        content: Text('Signed in as ${userCredential.user!.email}'),
+        backgroundColor: Colors.green,
+      );
+      // Navigate to the HomePage with the user object
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage(user: userCredential.user!)),
+      );
+    } catch (e) {
+      // Handle sign-in errors.
+      print('Error signing in: $e');
+      SnackBar snackBar = SnackBar(
+        content: Text('Error signing in: $e'),
+        backgroundColor: Colors.red,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,16 +131,11 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                 ),
-
-                // Log in button
-                const SizedBox(height: 25,),
-                ElevatedButton(
-                  onPressed: signIn,
-                  child: Text('Log In'),
+                const SizedBox(height: 25),
+                MyButton(
+                  text: 'Log In',
+                  onTap: () => signIn(context),
                 ),
-
-                //Or text
-
                 const SizedBox(height: 50),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -122,9 +149,9 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Text('Or continue with',style: TextStyle(
-                            color: Colors.grey[700]
-                        ),
+                        child: Text(
+                          'Or continue with',
+                          style: TextStyle(color: Colors.grey[700]),
                         ),
                       ),
                       Expanded(
@@ -155,16 +182,24 @@ class _LoginPageState extends State<LoginPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Not a member?',style: TextStyle(
-                            color: Colors.grey[700]
+                          'Not a member?',
+                          style: TextStyle(color: Colors.grey[700]),
                         ),
-                        ),
-                        const SizedBox(width: 10,),
-                        Text(
-                          'Register now',style: TextStyle(
-                            color: Colors.blue[500],
-                            fontWeight: FontWeight.bold
-                        ),
+                        const SizedBox(width: 10),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => RegisterPage()),
+                            );
+                          },
+                          child: Text(
+                            'Register now',
+                            style: TextStyle(
+                              color: Colors.blue[500],
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ],
                     ),
